@@ -16,7 +16,7 @@ else
 fi
 
 echo "⏳ Waiting for database..."
-until nc -z dbs 5432; do
+until nc -z $(echo $DATABASE_URL | sed "s|.*@||" | cut -d: -f1) 5432; do
   sleep 1
 done
 
