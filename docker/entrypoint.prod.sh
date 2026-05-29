@@ -16,18 +16,11 @@ else
   echo "Symlink to .env file already exists."
 fi
 
-if [ ! -z "$DATABASE_URL" ]; then
-  echo "Injecting DATABASE_URL..."
-  grep -v "^DATABASE_URL=" /app/env/.env > /tmp/.env.tmp
-  echo "DATABASE_URL=\"$DATABASE_URL\"" >> /tmp/.env.tmp
-  cp /tmp/.env.tmp /app/env/.env
-fi
-
-echo "✅ Database available. Applying 'prisma db push'..."
-npx dotenv -e /app/.env -- npx prisma db push
+echo "✅ Applying 'prisma db push'..."
+DATABASE_URL="$DATABASE_URL" npx prisma db push
 
 echo "📦 Running data and file migrations..."
-npx dotenv -e /app/.env -- node /app/migration-scripts/migrate.js
+DATABASE_URL="$DATABASE_URL" node /app/migration-scripts/migrate.js
 
 echo "🚀 Starting application..."
 exec npm run serve
