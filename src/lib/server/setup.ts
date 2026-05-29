@@ -251,11 +251,12 @@ BODY_SIZE_LIMIT=Infinity
 }
 
 export function resetProcessEnv(): void {
+  const dbUrl = process.env.DATABASE_URL
   if (process.env.IS_CONFIGURED) delete process.env.IS_CONFIGURED
-  if (process.env.DATABASE_URL) delete process.env.DATABASE_URL
   if (process.env.JWT_SECRET_KEY) delete process.env.JWT_SECRET_KEY
   if (process.env.UPDATER_HTTP_API_TOKEN) delete process.env.UPDATER_HTTP_API_TOKEN
   config({ path: envPath, quiet: true })
+  if (dbUrl) process.env.DATABASE_URL = dbUrl
 }
 
 export async function restartUpdater(): Promise<void> {
