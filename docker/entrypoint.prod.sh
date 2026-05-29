@@ -18,7 +18,9 @@ fi
 
 if [ ! -z "$DATABASE_URL" ]; then
   echo "Injecting DATABASE_URL..."
-  sed -i "s|DATABASE_URL=.*|DATABASE_URL=$DATABASE_URL|" /app/env/.env
+  grep -v "^DATABASE_URL=" /app/env/.env > /tmp/.env.tmp
+  echo "DATABASE_URL=\"$DATABASE_URL\"" >> /tmp/.env.tmp
+  cp /tmp/.env.tmp /app/env/.env
 fi
 
 echo "✅ Database available. Applying 'prisma db push'..."
