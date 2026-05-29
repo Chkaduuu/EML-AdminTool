@@ -1,14 +1,18 @@
-import { config } from 'dotenv'
-import { defineConfig } from 'prisma/config'
+#!/bin/sh
+set -e
 
-config({ override: false })
+echo "DATABASE_URL value: $DATABASE_URL"
+echo "🔧 Setting up environment variables..."
 
-export default defineConfig({
-  schema: 'prisma/schema.prisma',
-  migrations: {
-    path: 'prisma/migrations'
-  },
-  datasource: {
-    url: process.env.DATABASE_URL ?? 'postgresql://eml:eml@dbs:5432/eml_admintool' // default for build without env
-  }
-})
+rm -f /app/.env /app/env/.env
+touch /app/env/.env
+ln -sf /app/env/.env /app/.env
+
+echo "✅ Applying 'prisma db push'..."
+DOTENV_KEY="" DATABASE_URL="$DATABASE_URL" npx prisma db push --schema prisma/schema.prisma
+
+echo "📦 Running data and file migrations..."
+DATABASE_URL="$DATABASE_URL" node /app/migration-scripts/migrate.js
+
+echo "🚀 Starting application..."
+exec npm run serve
